@@ -1,21 +1,19 @@
 "use client"
 
-export const dynamic = 'force-dynamic';
-
+import { Suspense } from "react"
 import useWatchSession from "@/hooks/useWatchSession"
 import useYouTubePlayer from "@/hooks/useYouTubePlayer"
 import { useSearchParams } from "next/navigation"
-import { useCallback, useEffect } from "react"
 import MetricsTable from "./metricsTable"
 
 const FASTAPI_ENDPOINT = "http://localhost:8002/api/video-events/"
 
-export default function WatchPage() {
+function WatchContent() {
   const searchParams = useSearchParams()
   const videoId = searchParams.get("v")
 
-  const { playerRef, isReady, videoData } = useYouTubePlayer(videoId)
-  const { events, updateBackend } = useWatchSession(FASTAPI_ENDPOINT, videoId)
+  const { playerRef, videoData } = useYouTubePlayer(videoId)
+  const { events } = useWatchSession(FASTAPI_ENDPOINT, videoId)
 
   return (
     <main className="min-h-screen p-8 bg-zinc-950 text-zinc-100">
@@ -30,5 +28,13 @@ export default function WatchPage() {
         <MetricsTable events={events} />
       </div>
     </main>
+  )
+}
+
+export default function WatchPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-zinc-950 p-8 text-zinc-100">Loading video player...</div>}>
+      <WatchContent />
+    </Suspense>
   )
 }
