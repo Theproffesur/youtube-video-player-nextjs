@@ -1,7 +1,12 @@
-export const dynamic = 'force-dynamic';
-
 "use client"
 
+export const dynamic = 'force-dynamic';
+
+import useWatchSession from "@/hooks/useWatchSession"
+import useYouTubePlayer from "@/hooks/useYouTubePlayer"
+import { useSearchParams } from "next/navigation"
+import { useCallback, useEffect } from "react"
+// ... keep the rest of the imports and code as they were
 import useWatchSession from "@/hooks/useWatchSession"
 import useYouTubePlayer from "@/hooks/useYouTubePlayer"
 import { useSearchParams } from "next/navigation"
