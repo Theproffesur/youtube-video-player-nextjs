@@ -1,31 +1,35 @@
 "use client"
 
 import { Suspense } from "react"
-import useWatchSession from "@/hooks/useWatchSession"
-import useYouTubePlayer from "@/hooks/useYouTubePlayer"
 import { useSearchParams } from "next/navigation"
-import MetricsTable from "./metricsTable"
-
-const FASTAPI_ENDPOINT = "http://localhost:8002/api/video-events/"
 
 function WatchContent() {
   const searchParams = useSearchParams()
-  const videoId = searchParams.get("v")
+  // Default to a video ID or get it from URL parameter ?v=
+  const videoId = searchParams.get("v") || "dQw4w9WgXcQ"
+  
+  // If a full playlist ID is passed via NEXT_PUBLIC_YOUTUBE_PLAYLIST_ID or ?list=
+  const playlistId = searchParams.get("list") || process.env.NEXT_PUBLIC_YOUTUBE_PLAYLIST_ID
 
-  const { playerRef, videoData } = useYouTubePlayer(videoId)
-  const { events } = useWatchSession(FASTAPI_ENDPOINT, videoId)
+  const iframeSrc = playlistId
+    ? `https://www.youtube.com/embed/videoseries?list=${playlistId}&autoplay=1`
+    : `https://www.youtube.com/embed/${videoId}?autoplay=1`
 
   return (
-    <main className="min-h-screen p-8 bg-zinc-950 text-zinc-100">
-      <div className="max-w-4xl mx-auto space-y-6">
-        <div id="player" ref={playerRef} className="aspect-video w-full rounded-lg overflow-hidden bg-zinc-900" />
-        {videoData && (
-          <div className="space-y-2">
-            <h1 className="text-2xl font-bold">{videoData.title}</h1>
-            <p className="text-zinc-400">{videoData.author}</p>
-          </div>
-        )}
-        <MetricsTable events={events} />
+    <main className="min-h-screen p-4 sm:p-8 bg-zinc-950 text-zinc-100 flex flex-col items-center justify-center">
+      <div className="max-w-4xl w-full space-y-4">
+        <h1 className="text-xl sm:text-2xl font-bold text-center text-amber-400 font-serif tracking-wide">
+          DELUXE SALOON
+        </h1>
+        <div className="aspect-video w-full rounded-xl overflow-hidden bg-black shadow-2xl border-2 border-amber-500/30">
+          <iframe
+            className="w-full h-full"
+            src={iframeSrc}
+            title="YouTube Video Player"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          />
+        </div>
       </div>
     </main>
   )
@@ -33,7 +37,7 @@ function WatchContent() {
 
 export default function WatchPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-zinc-950 p-8 text-zinc-100">Loading video player...</div>}>
+    <Suspense fallback={<div className="min-h-screen bg-zinc-950 p-8 text-zinc-100 flex items-center justify-center">Loading Player...</div>}>
       <WatchContent />
     </Suspense>
   )
